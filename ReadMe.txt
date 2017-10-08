@@ -8,7 +8,7 @@ Overview:
 This Program allows users to create training, validation, and test set files, specifically for sound classification.
 These files can be used to train deep feed forward neural networks using the network and interface classes in the same program.
 
-The program interface is a shell with the following commands:
+The program interface is a shell with the following commands/functions:
 
 1:Create a network
 2:Load a Network from the file System
