@@ -4,6 +4,7 @@ public class Connection {
 
 	Neuron to;
 	Neuron from;
+	
 
 	float weight;
 	float learningConstant;

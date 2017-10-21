@@ -10,6 +10,9 @@ public class Network {
 	ArrayList<ArrayList<Neuron>> hiddenLayers;
 	ArrayList<Neuron> outputLayer;
 	
+	float[] currentInputs;
+	float[] currentOutputs;
+	
 	float[] summedError;
 	float learningRate = (float).001;
 	
@@ -24,7 +27,6 @@ public class Network {
 	//Allocates space for the input layer, hidden layer, output layer, and connections, which are all array lists.
 	public Network()
 	{
-		
 		inputLayer = new ArrayList<Neuron>();
 		hiddenLayers = new ArrayList<ArrayList<Neuron>>();
 		outputLayer = new ArrayList<Neuron>();
@@ -54,6 +56,8 @@ public class Network {
 	public void setup(int iSize, int hSize, int oSize, int numHiddenLayers)
 	{
 		summedError = new float[oSize];
+		currentInputs = new float[iSize];
+		currentOutputs = new float[oSize];
 		
 		numHLayers = numHiddenLayers;
 		
@@ -138,6 +142,7 @@ public class Network {
 				Connection c = new Connection(inputLayer.get(i), hiddenLayers.get(0).get(j), 1, 1, 1);
 				connections.add(c);
 				inputLayer.get(i).addOutputConnection(c);
+				hiddenLayers.get(0).get(j).addBackwardConnection(c);
 			}
 		}
 		
@@ -150,6 +155,7 @@ public class Network {
 					Connection p = new Connection(hiddenLayers.get(c).get(i), hiddenLayers.get(c + 1).get(j), 1, 1, 1);
 					connections.add(p);
 					hiddenLayers.get(c).get(i).addOutputConnection(p);
+					hiddenLayers.get(c+1).get(j).addBackwardConnection(p);
 				}
 			}
 		}
@@ -161,6 +167,7 @@ public class Network {
 				Connection c = new Connection(hiddenLayers.get(numHiddenLayers-1).get(i), outputLayer.get(j), 1, 1, 1);
 				connections.add(c);
 				hiddenLayers.get(numHiddenLayers-1).get(i).addOutputConnection(c);
+				outputLayer.get(j).addBackwardConnection(c);
 			}
 		}
 			
@@ -184,6 +191,10 @@ public class Network {
 	//-ed as an array of floats.
 	public float[] feedForward(float[] inputs)
 	{
+		
+		for(int i = 0; i < inputs.length; i++)
+			currentInputs[i] = inputs[i];
+		
 		for(int i = 0; i < inputs.length; i++)
 		{
 			inputLayer.get(i).addWeightedInput(inputs[i]);
@@ -206,7 +217,15 @@ public class Network {
 		
 		float out[] = new float[outputLayer.size()];
 		
+		
 		out = softMax(outputs);
+		
+
+		
+		for(int i = 0; i < outputLayer.size(); i++)
+		{
+			currentOutputs[i] = out[i];
+		}
 		return out;
 	}
 	
@@ -359,6 +378,38 @@ public class Network {
 		//---------------------------------------------------------------------
 	}
 	
+	public float[] feedBackward(){
+		
+		
+		for(int i = 0; i < outputLayer.size(); i++)
+		{
+			outputLayer.get(i).addWeightedInput(currentOutputs[i]);
+			outputLayer.get(i).feedBackward();
+		}
+		
+		
+		for(int i = hiddenLayers.size() - 1; i >=0; i-- )
+		{
+			System.out.println("Layer " + i);
+			for(int j = 0; j < hiddenLayers.get(i).size(); j++)
+			{
+				hiddenLayers.get(i).get(j).feedBackward();
+				System.out.println("" + j + " " + hiddenLayers.get(i).get(j).o);
+			}
+			System.out.println("");
+		}
+		
+		float [] finalZ = new float[inputLayer.size()];
+		
+		for(int i = 0; i < inputLayer.size(); i++)
+			finalZ[i] = inputLayer.get(i).z;
+		
+		float [] out =softMax(finalZ);
+		
+		return out;
+		
+	}
+	
 	//Returns the value of the quadratic cost function.
 	public float costFunction(float output, float desired)
 	{
@@ -425,9 +476,9 @@ public class Network {
 	}
 	
 	//Returns the value of the sigmoid(activation) function.
-	public float Relu(float z)
+	public float relu(float z)
 	{
-		if(z > 0)
+		if(z >= 0)
 			z = z;
 		else
 			z = (float).01 * z;
@@ -546,6 +597,25 @@ public class Network {
 		for(int i = 0; i < connections.size(); i++)
 		{
 			connections.get(i).weight = Float.parseFloat(reader.readLine());
+		}
+	}
+	
+	public void clearInternals()
+	{
+		for(int i = 0; i < inputLayer.size(); i++)
+		{
+			inputLayer.get(i).clear();
+		}
+		
+		for(int i = 0; i < hiddenLayers.size(); i++)
+		{
+			for(int j = 0; j < hiddenLayers.get(i).size(); j++)
+				hiddenLayers.get(i).get(j).clear();
+		}
+		
+		for(int i = 0; i < outputLayer.size(); i++)
+		{
+			outputLayer.get(i).clear();
 		}
 	}
 }

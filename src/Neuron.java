@@ -4,6 +4,7 @@ import java.util.Random;
 public class Neuron {
 
 	ArrayList<Connection> outputs;
+	ArrayList<Connection> backwardOutputs;
 	ArrayList<Float> weightedInputs;
 	
 	int x;
@@ -28,6 +29,7 @@ public class Neuron {
 		name = n;
 		
 		outputs = new ArrayList<Connection>();
+		backwardOutputs = new ArrayList<Connection>();
 		
 		weightedInputs = new ArrayList<Float>();
 		
@@ -50,6 +52,17 @@ public class Neuron {
 		outputs.add(c);
 	}
 	
+	public void addBackwardConnection(Connection c){
+		backwardOutputs.add(c);
+	}
+	
+	public void clear()
+	{
+		zBP = 0;
+		z = 0;
+		o = 0;
+		error = 0;
+	}
 	
 	//This function feeds forward to neurons in the next layer.
 	public float feedForward()
@@ -99,4 +112,54 @@ public class Neuron {
 		//return the value of the activation function for this neuron.
 		return r;
 	}
+	
+	public float feedBackward(){
+		
+		float r = 0;
+		
+		//Add the bias to the list of inputs.
+		z += bias;
+		
+		//Keep track of z at the class level for use in backpropogation.
+
+		
+		//Clear the list of weighted inputs.
+		weightedInputs.clear();
+		
+		//Calculate the activation function for feeding forward
+		
+		if(typeA == 0)
+		{
+			if( z < 0)
+				z = (float).01*z;
+
+			r = z;
+		}
+		else if(typeA == 1)
+		{
+			r = (float) (1 / (1 +(Math.pow(Math.E, -z))));
+		}
+		else if(typeA == 2)
+		{
+			r = z;
+		}
+		
+		zBP = z;
+		z = 0;
+		//Keep track of the value of the activation function
+		o = r;
+		
+		//Feed to the "to" neurons of each connection by adding the value of activation function times the 
+		//weight of the respective connection to the weightInputs of the "to" neuron. Don't do this for the output
+		//layer, as the output layer has no output connections.
+		for(int i = 0; i < backwardOutputs.size(); i++)
+		{
+			backwardOutputs.get(i).from.addWeightedInput(r * backwardOutputs.get(i).weight);
+		}
+		
+		//return the value of the activation function for this neuron.
+		return r;
+	}
+	
+
 }

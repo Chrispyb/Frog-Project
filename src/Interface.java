@@ -68,6 +68,8 @@ public class Interface {
 				case "12":
 					automateTraining(scanner);
 					break;
+				case "13":
+					feedBackward();
 				default:
 					System.out.println("Invalid Input. Please Enter a valid option.");
 					break;
@@ -93,6 +95,7 @@ public class Interface {
 		System.out.println("Option '10': Print Connections As C code");
 		System.out.println("Option '11': Print to a file");
 		System.out.println("Option '12': Automate training/testing");
+		System.out.println("Option '13': Feed Backward");
 		System.out.print("Option?:");
 	}
 	
@@ -773,6 +776,14 @@ public class Interface {
 		
 		
 		
+	}
+	
+	public static void feedBackward(){
+		network.clearInternals();
+		float [] out = network.feedBackward();
+		
+		for(int i = 0; i < out.length; i++)
+			System.out.println(out[i]);
 	}
 	
 	public static void printToFile(Scanner scanner) throws IOException
