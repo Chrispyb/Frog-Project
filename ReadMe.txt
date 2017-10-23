@@ -24,12 +24,12 @@ The program interface is a shell with the following commands/functions:
 Option '1': Create a new network from scratch.-
 
 	This option will create a feed forward neural network, and replace any neural network that already exists. It will  prompt
-	the user to enter how neurons for each layer and how many hidden layers to add and then create a neural network with those dimensions.
+the user to enter how neurons for each layer and how many hidden layers to add and then create a neural network with those dimensions.
 
 Option '2': Load a network from the file system.-
 
 	This option allows a neural network file to be loaded from the file system into the program by the user, creating a network with the same dimensions,
-	weights, and biases. 
+weights, and biases. 
 
 Option '3': Save the current network.-
 
@@ -42,7 +42,7 @@ Option '4': Delete the current neural network.
 Option '5': Train this neural network using a training file.-
 
 	This option allows the user to enter the location of a training file to train the neural network with using stochastic gradient
-	descent.
+descent.
 
 Option '6': Test the network using a input file.
 	
@@ -51,7 +51,7 @@ Option '6': Test the network using a input file.
 Option '7': Digital signal processing interface.
 	
 	This option changes from the current interface to the DSP interface. The DSP interface allows the user to create training, test,
-	and validation sets from Wav files, these sets can then be saved as files and can be used to train and test a neural network.
+and validation sets from Wav files, these sets can then be saved as files and can be used to train and test a neural network.
 
 Option '8': Quit This Program.
 	
