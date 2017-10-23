@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -23,56 +24,66 @@ public class Interface {
 		
 		Scanner scanner = new Scanner(System.in);
 		
-		System.out.println("Welcome to Basic Network Builder");
+		System.out.println("Welcome to Basic Neural Network Builder");
 		System.out.println("");
 		
 		while(!quit)
 		{
 			printOptions();
-			
-			switch(scanner.nextLine())
-			{
-				case "1":
-					create(scanner);
-					break;
-				case "2":
-					load(scanner);
-					break;
-				case "3":
-					save(scanner);
-					break;
-				case "4":
-					delete();
-					break;
-				case "5":
-					train(scanner);
-					break;
-				case "6":
-					test(scanner);
-					break;
-				case "7":
-					dsp();
-					break;
-				case "8":
-					saveVerilog(scanner);
-					break;
-				case "9":
-					quit();
-					break;
-				case "10":
-					printAsC(scanner);
-					break;
-				case "11":
-					printToFile(scanner);
-					break;
-				case "12":
-					automateTraining(scanner);
-					break;
-				case "13":
-					feedBackward();
-				default:
-					System.out.println("Invalid Input. Please Enter a valid option.");
-					break;
+			try {
+				switch(scanner.nextLine())
+				{
+					case "1":
+						create(scanner);
+						break;
+					case "2":
+						load(scanner);
+						break;
+					case "3":
+						save(scanner);
+						break;
+					case "4":
+						delete();
+						break;
+					case "5":
+						train(scanner);
+						break;
+					case "6":
+						test(scanner);
+						break;
+					case "7":
+						dsp();
+						break;
+					case "8":
+						quit();
+						break;
+					/*case "9":
+						quit();
+						break;
+					case "10":
+						printAsC(scanner);
+						break;
+					case "11":
+						printToFile(scanner);
+						break;
+					case "12":
+						automateTraining(scanner);
+						break;
+					case "13":
+						feedBackward();*/
+					default:
+						System.out.println("Invalid Input. Please Enter a valid option.");
+						break;
+				}
+			}
+			catch(FileNotFoundException e){
+				System.out.println(e.getMessage());
+			}
+			catch(NumberFormatException e){
+				System.out.println(e.getMessage());
+			}
+			catch(Exception e){
+				System.out.println(e.getMessage());
 			}
 			
 		}
@@ -90,13 +101,13 @@ public class Interface {
 		System.out.println("Option '5': Train this neural network using a training file.");
 		System.out.println("Option '6': Test the network using a input file.");
 		System.out.println("Option '7': Digital signal processing interface.");
-		System.out.println("Option '8': Save Network as Verilog file.");
-		System.out.println("Option '9': Quit this simulation.");
+		System.out.println("Option '8': Quit This Program.");
+		/*System.out.println("Option '9': Quit this simulation.");
 		System.out.println("Option '10': Print Connections As C code");
 		System.out.println("Option '11': Print to a file");
 		System.out.println("Option '12': Automate training/testing");
-		System.out.println("Option '13': Feed Backward");
-		System.out.print("Option?:");
+		System.out.println("Option '13': Feed Backward");*/
+		System.out.print("Option?: ");
 	}
 	
 	public static void create(Scanner scanner){
@@ -362,7 +373,7 @@ public class Interface {
 				for(int i = 0; i < network.outputLayer.size(); i++)
 				{
 					desiredO[i] = Float.parseFloat(reader.readLine());
-					System.out.println("Desired output " + i + " : " + desiredO[i]);
+					//System.out.println("Desired output " + i + " : " + desiredO[i]);
 				}
 				
 				inputs.add(in);
@@ -466,7 +477,7 @@ public class Interface {
 				System.out.println("Output Neuron " + k + " output: ");
 				
 				for(int i = 0; i < network.outputLayer.size(); i++)
-					System.out.println(" " + outP[i]);
+					//System.out.println(" " + outP[i]);
 					
 				writer.println("Output Neuron " + k + " output: " + outP[0]);
 			}

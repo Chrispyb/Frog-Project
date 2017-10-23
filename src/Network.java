@@ -74,12 +74,6 @@ public class Network {
 			
 		}
 		
-		for(int i = 0; i < 4; i++)
-			System.out.print(numLayerG[i]);
-		
-		System.out.println("");
-		System.out.println(getBinary(numLayerG));
-		
 		numHLayers = getBinary(numLayerG);
 		
 		neuronPerLayerG = new ArrayList<char []>();
@@ -100,14 +94,7 @@ public class Network {
 			neuronPerLayerG.add(newChar);
 		}
 		
-		
-		for(int i = 0; i < neuronPerLayerG.size(); i++)
-		{
-			for(int j = 0; j < neuronPerLayerG.get(i).length; j++)
-				System.out.print(neuronPerLayerG.get(i)[j]);
-			
-			System.out.println("");
-		}
+
 		//Create the neurons for input, hidden, and output layers.
 		for(int i = 0; i < iSize; i++)
 		{
@@ -121,11 +108,6 @@ public class Network {
 			{
 				addNeuronHL(new Neuron(0,0, "H" + j, 0), i);
 			}
-		}
-		
-		for(int i = 0; i < numHiddenLayers; i++)
-		{
-			System.out.println(hiddenLayers.get(i).size());
 		}
 		
 		for(int i = 0; i < oSize; i++)
@@ -390,13 +372,11 @@ public class Network {
 		
 		for(int i = hiddenLayers.size() - 1; i >=0; i-- )
 		{
-			System.out.println("Layer " + i);
 			for(int j = 0; j < hiddenLayers.get(i).size(); j++)
 			{
 				hiddenLayers.get(i).get(j).feedBackward();
 				System.out.println("" + j + " " + hiddenLayers.get(i).get(j).o);
 			}
-			System.out.println("");
 		}
 		
 		float [] finalZ = new float[inputLayer.size()];
@@ -462,7 +442,6 @@ public class Network {
 		}
 		
 		r += a;
-		System.out.println(r);
 		return r;
 	}
 	//The partial derivative of the sigmoid function with resepct to the sum of weighted inputs.

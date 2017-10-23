@@ -29,24 +29,35 @@ public class DSP {
 			System.out.println("Please select an option:");
 			printOptions();
 			
-			switch(scanner.nextLine())
-			{
-			
-			case "1":
-				openWav(scanner);
-				break;
-			case "2":
-				createTrainerO();
-				break;
-			case "3":
-				returnToMain();
-				break;
-			case "4":
-				build(scanner);
-				break;
-			default:
-				System.out.println("Invalid Option");
-				break;
+			try{
+				switch(scanner.nextLine())
+				{
+				
+				case "1":
+					openWav(scanner);
+					break;
+				case "2":
+					createTrainerO();
+					break;
+				case "3":
+					returnToMain();
+					break;
+				case "4":
+					build(scanner);
+					break;
+				default:
+					System.out.println("Invalid Option");
+					break;
+				}
+			}
+			catch(FileNotFoundException e){
+				System.out.println(e.getMessage());
+			}
+			catch(NumberFormatException e){
+				System.out.println(e.getMessage());
+			}
+			catch(Exception e){
+				System.out.println(e.getMessage());
 			}
 		}
 	}
@@ -58,99 +69,94 @@ public class DSP {
 		System.out.println("Option 2: Convert current .wav file into training file");
 		System.out.println("Option 3: Return to original interface.");
 		System.out.println("Option 4: Prebuild");
+		System.out.print("Option?: ");
 		
 	}
 	
-	public void openWav(Scanner scanner)
+	public void openWav(Scanner scanner) throws NumberFormatException, IOException, WavFileException
 	{
 		
-		 try
-	      {
-			 ArrayList<double[]> tempBuffer = new ArrayList<double[]>();
-			 
-			 System.out.print("Enter .wav file location: ");
-			 String wavLocation = scanner.nextLine();
-			 
-			 String stringNew = wavLocation.replace("\\", "/");
-			 
-	         // Open the wav file specified as the first argument
-	         WavFile wavFile = WavFile.openWavFile(new File(stringNew));
-
-	         // Display information about the wav file
-	         wavFile.display();
-
-	         // Get the number of audio channels in the wav file
-	         int numChannels = wavFile.getNumChannels();
-	         
-	        
-	         System.out.println("1");
-	         // Create a buffer of 100 frames
-	         int framesRead;
-	         
-	         double tempBuff[] = new double[numChannels*windowSize];
-	         
-	         do
-	         {
-	        	
-	            // Read frames into buffer
-	        	
-	            framesRead = wavFile.readFrames(tempBuff, windowSize);
-	            double newBuffer[] = getFirstChannel(tempBuff, windowSize);
-	 
-	            tempBuffer.add(newBuffer);
-	         
-	            
-	         }
-	         while (framesRead != 0);
-
-	         // Close the wavFile
-	         wavFile.close();
-	         
-				FFT fft = new FFT(256, -1);
-				ArrayList<double[]> newBuffer = new ArrayList<double[]>();
-				sizeF+= tempBuffer.size();
-				
-				for(int i = 0; i < tempBuffer.size(); i++)
-				{
-						fft.transform(tempBuffer.get(i));
-						
-						double [] buf = new double[128];
-						
-						for(int j = 128; j < 256; j++)
-						{
-							buf[j-128] = (double) tempBuffer.get(i)[j];
-						}
-						double temp1[] = normalizeFunction(tempBuffer.get(i), windowSize);
-						
-						//double temp2[] = window(temp1, 8);
-					
-							
-						newBuffer.add(temp1);
-				}
-				
-	         if(tempBuffer.size() > max)
-	        	 max = tempBuffer.size();
-	         
-	         buffer.add(newBuffer);
-	      }
-	      catch (Exception e)
-	      {
-	         System.err.println(e);
-	      }
+		 ArrayList<double[]> tempBuffer = new ArrayList<double[]>();
 		 
-			System.out.println("How many outputs?: ");
+		 System.out.print("Enter .wav file location: ");
+		 String wavLocation = scanner.nextLine();
+		 
+		 String stringNew = wavLocation.replace("\\", "/");
+		 
+         // Open the wav file specified as the first argument
+         WavFile wavFile = WavFile.openWavFile(new File(stringNew));
+
+         // Display information about the wav file
+         wavFile.display();
+
+         // Get the number of audio channels in the wav file
+         int numChannels = wavFile.getNumChannels();
+         
+        
+         System.out.println("1");
+         // Create a buffer of 100 frames
+         int framesRead;
+         
+         double tempBuff[] = new double[numChannels*windowSize];
+         
+         do
+         {
+        	
+            // Read frames into buffer
+        	
+            framesRead = wavFile.readFrames(tempBuff, windowSize);
+            double newBuffer[] = getFirstChannel(tempBuff, windowSize);
+ 
+            tempBuffer.add(newBuffer);
+         
+            
+         }
+         while (framesRead != 0);
+
+         // Close the wavFile
+         wavFile.close();
+         
+			FFT fft = new FFT(256, -1);
+			ArrayList<double[]> newBuffer = new ArrayList<double[]>();
+			sizeF+= tempBuffer.size();
 			
-			int numOut = Integer.parseInt(scanner.nextLine());
-			
-			String val[] = new String[numOut];
-			
-			for(int i = 0; i < numOut; i++)
+			for(int i = 0; i < tempBuffer.size(); i++)
 			{
-				System.out.println("Please enter a value between 0 and 1 for the desired output #" + i + ": ");
-				val[i] = scanner.nextLine();
+					fft.transform(tempBuffer.get(i));
+					
+					double [] buf = new double[128];
+					
+					for(int j = 128; j < 256; j++)
+					{
+						buf[j-128] = (double) tempBuffer.get(i)[j];
+					}
+					double temp1[] = normalizeFunction(tempBuffer.get(i), windowSize);
+					
+					//double temp2[] = window(temp1, 8);
+				
+						
+					newBuffer.add(temp1);
 			}
 			
-			outputs.add(val);
+         if(tempBuffer.size() > max)
+        	 max = tempBuffer.size();
+         
+         buffer.add(newBuffer);
+  
+	 
+		System.out.println("How many outputs?: ");
+		
+		int numOut = Integer.parseInt(scanner.nextLine());
+		
+		String val[] = new String[numOut];
+		
+		for(int i = 0; i < numOut; i++)
+		{
+			System.out.println("Please enter a value between 0 and 1 for the desired output #" + i + ": ");
+			val[i] = scanner.nextLine();
+		}
+		
+		outputs.add(val);
 	}
 	
 	public void createTrainer() throws IOException
@@ -233,7 +239,7 @@ public class DSP {
 		writer.close();
 	}
 	
-	public double[] normalizeFunction(double[] window, int fSize)
+	public double[] normalizeFunction(double[] window, int fSize) throws ArithmeticException
 	{
 		double r[] = new double[128];
 		double max = .01;
