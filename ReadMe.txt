@@ -24,7 +24,7 @@ The program interface is a shell with the following commands/functions:
 Option '1': Create a new network from scratch.-
 
 	This option will create a feed forward neural network, and replace any neural network that already exists. It will  prompt
-the user to enter how neurons for each layer and how many hidden layers to add and then create a neural network with those dimensions.
+the user to enter the number of neurons for each layer and the number of hidden layers to add and then create a neural network with those dimensions.
 
 Option '2': Load a network from the file system.-
 
