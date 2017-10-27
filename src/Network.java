@@ -563,8 +563,9 @@ public class Network {
 				hiddenLayers.get(i).get(j).bias = Float.parseFloat(reader.readLine());
 			}
 			
-			reader.readLine();
 		}
+		
+		reader.readLine();
 		
 		for(int i = 0; i < outputLayer.size(); i++)
 		{
