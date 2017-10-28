@@ -23,6 +23,15 @@ public class DSP {
 
 	}
 	
+	public DSP(String listFile, String saveLoc) throws IOException, NumberFormatException, WavFileException{
+		
+		buffer = new ArrayList<ArrayList<double[]>>();
+		outputs = new ArrayList<String >();
+		
+		createTrainerFromFileS(listFile, saveLoc);
+
+	}
+	
 	public void printOptions(){
 		
 		System.out.println("");
@@ -175,8 +184,7 @@ public class DSP {
 							buf[j-fftSize/2] = (double) tempBuffer.get(i)[j];
 						}
 						double temp1[] = normalizeFunction(buf);
-						System.out.println(buf[0]);
-						
+
 						//double temp2[] = window(temp1, 8);
 					
 							
@@ -205,6 +213,37 @@ public class DSP {
 		
 		
 		File file = new File(location);
+		
+		PrintWriter writer = new PrintWriter(new FileWriter(file), true);
+		
+		int totalSize = 0;
+		
+		int sizes[] = new int[buffer.size()];
+		
+		for(int i = 0; i < buffer.size(); i++)
+			sizes[i] = buffer.get(i).size();
+		
+		
+		writer.println(sizeF);
+		
+		for(int i = 0; i < buffer.size(); i++)
+		{
+			for(int j = 0; j < buffer.get(i).size(); j++)
+			{
+				for(int k = 0; k < buffer.get(i).get(j).length; k++)
+					writer.println(buffer.get(i).get(j)[k]);
+				
+				for(int k = 0; k < outputs.size(); k++)
+					writer.println(outputs.get(i).charAt(i));
+			}
+		}
+		writer.close();
+	}
+	
+	public void createTrainerOS(String fileLoc) throws IOException
+	{
+		
+		File file = new File(fileLoc);
 		
 		PrintWriter writer = new PrintWriter(new FileWriter(file), true);
 		
@@ -261,6 +300,34 @@ public class DSP {
 		}
 		
 		createTrainerO(scanner);
+		reader.close();
+		
+	}
+	
+	public void createTrainerFromFileS(String listFile, String outputFile) throws NumberFormatException, IOException, WavFileException, FileNotFoundException {
+		
+		ArrayList<String> fileLocs = new ArrayList<String>();
+		ArrayList<String> outputs = new ArrayList<String>();
+		
+		File file = new File(listFile);
+		
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		
+		int windowSize = Integer.parseInt(reader.readLine());
+		
+		int fftRes = Integer.parseInt(reader.readLine());
+		
+		int numFiles = Integer.parseInt(reader.readLine());
+		
+		for(int i = 0; i < numFiles; i++){
+			
+			fileLocs.add(reader.readLine());
+			outputs.add(reader.readLine());
+			System.out.println("" + fileLocs.get(i));
+			openWav(fileLocs.get(i), outputs.get(i), windowSize, fftRes);
+		}
+		
+		createTrainerOS(outputFile);
 		reader.close();
 		
 	}

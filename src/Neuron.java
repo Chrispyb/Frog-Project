@@ -37,7 +37,6 @@ public class Neuron {
 		
 
 		bias = (float) (random.nextFloat() * 0.125);
-		System.out.println(bias);
 	}
 	
 	//Function which adds a weighted input to the list of inputs for this neuron.
