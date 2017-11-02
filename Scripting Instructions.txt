@@ -1,0 +1,60 @@
+How to use the scripting engine:
+
+To use the scripting engine, add the -s option from the command line as an option to the csnn jar file. Otherwise, the program will run
+in interactive mode.
+
+The scripting engine executes commands sequentially, it is added as the last argument when running the jar file from the command line.
+
+To run from cmd type something like-
+
+java -jar C:\Users\Chris\Desktop\csnn.jar -s C:\Users\Chris\Desktop\script.txt
+
+But use the proper paths for your computer, second option is the scripting file.
+
+Scripting engine functions:
+
+//Create a neural network
+create(){
+	Number of input layer nodes(integer)
+	Number of hidden layer nodes(integer)
+	Number of output layer nodes(integer)
+	Number of hidden layers(integer)
+	Option to add residual connections(isResidual), else non-residual
+}
+
+
+//Load a neural network file from the file system. Note- Neural network dimensions must first be specified with the create command,
+this option simply loads the proper weights and biases.
+load(){
+	file location(String)
+}
+
+//Saves the current neural network to the specified location in the file system.
+save(){
+	file location(String)
+}
+
+//Loads the specified training, validation, and test set, then trains, validates, and tests using these sets. L2 regularization constant is specified. 
+tvt(){
+	training set location(String)
+	validation set location(String)
+	test set location(String)
+	L2 regularization constant(Float between 0 and 1)
+}
+
+//Digital signal processing interface creates trainer, validation, and test files from listing files.
+dsp(){
+	listing file location(String)
+	output file location(String)	
+}
+
+What is a listing file?
+
+A listing file contains .wav file locations and information on how to transform the files into trainer/test/validation files.
+The format looks like:
+
+1.window size(Integer, must be a base 2 number)
+2.fft resolution(Integer, must also be base 2, eg. 2, 4, 16.... 256)
+3..wav file location
+4.preceding wav file output, e.g. 1000 for a network with 4 output nodes, 100000 for a network with 6 output nodes
+5.repeat steps 3 and 4 as many times as needed until the set is complete.
