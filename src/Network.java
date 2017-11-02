@@ -16,6 +16,9 @@ public class Network {
 	float[] summedError;
 	float learningRate = (float).001;
 	
+	boolean isResidual = true;
+	
+	
 	ArrayList<Connection> connections;
 	
 	char [] numLayerG = { '0', '0', '0', '0'};
@@ -31,6 +34,16 @@ public class Network {
 		hiddenLayers = new ArrayList<ArrayList<Neuron>>();
 		outputLayer = new ArrayList<Neuron>();
 		connections = new ArrayList<Connection>();
+	}
+	
+	public Network(boolean isResidual)
+	{
+		inputLayer = new ArrayList<Neuron>();
+		hiddenLayers = new ArrayList<ArrayList<Neuron>>();
+		outputLayer = new ArrayList<Neuron>();
+		connections = new ArrayList<Connection>();
+		
+		this.isResidual = isResidual;
 	}
 	
 	//Add neuron to the input layer.
@@ -183,10 +196,21 @@ public class Network {
 			inputLayer.get(i).feedForward();
 		}
 		
+		if(isResidual){
+			for(int i = 0; i < hiddenLayers.get(0).size(); i++)
+				hiddenLayers.get(0).get(i).o += inputLayer.get(i).o;
+		}
+			
 		for(int i = 0; i < hiddenLayers.size(); i++)
 		{
 			for(int j = 0; j < hiddenLayers.get(0).size(); j++)
 				hiddenLayers.get(i).get(j).feedForward();
+			
+			for(int j = 0; j < hiddenLayers.get(0).size(); j++)
+			{
+				if(isResidual && i < hiddenLayers.size()-1)
+					hiddenLayers.get(i+1).get(j).o += hiddenLayers.get(i).get(j).o;
+			}
 		}
 		
 		float outputs[] = new float[outputLayer.size()];
@@ -201,9 +225,7 @@ public class Network {
 		
 		
 		out = softMax(outputs);
-		
-
-		
+	
 		for(int i = 0; i < outputLayer.size(); i++)
 		{
 			currentOutputs[i] = out[i];
@@ -358,6 +380,7 @@ public class Network {
 		
 		//------------------END GRADIENT DESCENT-------------------------------
 		//---------------------------------------------------------------------
+		clearInternals();
 	}
 	
 	public float[] feedBackward(){

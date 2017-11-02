@@ -38,7 +38,7 @@ public class Connection {
 		}
 		
 		weight = (float) (random.nextFloat() / Math.sqrt(128));
-		learningConstant /= 1000;
+		learningConstant = weight/ 1000;
 
 	}
 }

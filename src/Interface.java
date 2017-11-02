@@ -133,7 +133,15 @@ public class Interface {
 					
 					reader.close();
 			 }
-			 catch(Exception e){}
+				catch(FileNotFoundException e){
+					System.out.println(e.getMessage());
+				}
+				catch(NumberFormatException e){
+					System.out.println(e.getMessage());
+				}
+				catch(Exception e){
+					System.out.println(e.getMessage());
+				}
 			 
 		}
 	}
@@ -147,8 +155,14 @@ public class Interface {
 				int hSize = Integer.parseInt(reader.readLine().trim());
 				int oSize = Integer.parseInt(reader.readLine().trim());
 				int numH = Integer.parseInt(reader.readLine().trim());
+				String choice = reader.readLine().trim();
+				boolean isResidual = false;
+				
+				if(choice.equals("isResidual"))
+					isResidual = true;
+				
 				reader.readLine();
-				createS(iSize,hSize,oSize, numH);
+				createS(iSize,hSize,oSize, numH, isResidual);
 				break;
 				
 			case "load(){":
@@ -167,8 +181,9 @@ public class Interface {
 				String tLoc = reader.readLine().trim();
 				String vLoc = reader.readLine().trim();
 				String testLoc = reader.readLine().trim();
+				float regConst = Float.parseFloat(reader.readLine().trim());
 				reader.readLine();
-				tvt(tLoc, vLoc, testLoc);
+				tvt(tLoc, vLoc, testLoc, regConst);
 				break;
 				
 			case "dsp(){":
@@ -233,12 +248,16 @@ public class Interface {
 		System.out.println("");
 	}
 	
-	public static void createS(int iSize, int hSize, int oSize, int numH){
+	public static void createS(int iSize, int hSize, int oSize, int numH, boolean isResidual){
 		
 		network = new Network();
 		network.setup(iSize, hSize, oSize, numH);
 		
-		System.out.println("Network Created with ISize: " + iSize + " HSize: " + hSize + " OSize: " + oSize);
+		System.out.println("Network Created with ISize: " + iSize + " HSize: " + hSize + " OSize: " + oSize + " numHiddenLayers: " + numH);
+		
+		if(isResidual)
+			System.out.println("Residual connections enabled.");
+		
 		System.out.println("");
 	}
 	
@@ -411,7 +430,7 @@ public class Interface {
 			System.out.println("No Network exists. Create a network before training.");
 	}
 	
-	public static void tvt(String tLoc, String vLoc, String testLoc) throws IOException{
+	public static void tvt(String tLoc, String vLoc, String testLoc, float regConstant) throws IOException{
 		
 		if(network != null)
 		{
@@ -447,7 +466,6 @@ public class Interface {
 					out[i] = Float.parseFloat(reader.readLine());
 					
 				}
-				
 				inputsT.add(in);
 				outputsT.add(out);
 				
@@ -525,7 +543,7 @@ public class Interface {
 				for(int j = 0; j < numTrainersT/10; j++)
 				{
 					int p = random.nextInt(numTrainersT);
-					network.trainNetwork(inputsT.get(p), outputsT.get(p), 1, numTrainersT/10,(float) 0.00001);
+					network.trainNetwork(inputsT.get(p), outputsT.get(p), 1, numTrainersT/10,regConstant);
 					
 				}
 
@@ -535,7 +553,8 @@ public class Interface {
 				{
 					int p = random.nextInt(numTrainersV);
 					float [] output = network.feedForward(inputsV.get(p));
-					
+					network.clearInternals();
+				
 					float max = 0;
 					int element = 0;
 					
@@ -563,7 +582,7 @@ public class Interface {
 				
 				float totalError = error/(numTrainersV/10);
 				System.out.println("Verification set error: " + totalError);
-				
+
 				if(totalError >= lastError){
 					quitCounter++;
 					

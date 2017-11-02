@@ -264,8 +264,8 @@ public class DSP {
 				for(int k = 0; k < buffer.get(i).get(j).length; k++)
 					writer.println(buffer.get(i).get(j)[k]);
 				
-				for(int k = 0; k < outputs.size(); k++)
-					writer.println(outputs.get(i).charAt(i));
+				for(int k = 0; k < outputs.get(i).length(); k++)
+					writer.println(outputs.get(i).charAt(k));
 			}
 		}
 		writer.close();
@@ -289,16 +289,17 @@ public class DSP {
 		
 		int fftRes = Integer.parseInt(reader.readLine());
 		
-		int numFiles = Integer.parseInt(reader.readLine());
+		String fileLoc1 = "";
+		int i = 0;
 		
-		for(int i = 0; i < numFiles; i++){
+		while((fileLoc1 = reader.readLine())!=null){
 			
-			fileLocs.add(reader.readLine());
+			fileLocs.add(fileLoc1);
 			outputs.add(reader.readLine());
 			System.out.println("" + fileLocs.get(i));
 			openWav(fileLocs.get(i), outputs.get(i), windowSize, fftRes);
+			i++;
 		}
-		
 		createTrainerO(scanner);
 		reader.close();
 		
@@ -317,14 +318,16 @@ public class DSP {
 		
 		int fftRes = Integer.parseInt(reader.readLine());
 		
-		int numFiles = Integer.parseInt(reader.readLine());
+		String fileLoc = "";
+		int i = 0;
 		
-		for(int i = 0; i < numFiles; i++){
+		while((fileLoc = reader.readLine())!=null){
 			
-			fileLocs.add(reader.readLine());
+			fileLocs.add(fileLoc);
 			outputs.add(reader.readLine());
 			System.out.println("" + fileLocs.get(i));
 			openWav(fileLocs.get(i), outputs.get(i), windowSize, fftRes);
+			i++;
 		}
 		
 		createTrainerOS(outputFile);

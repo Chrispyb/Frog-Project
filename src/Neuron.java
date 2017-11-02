@@ -98,7 +98,7 @@ public class Neuron {
 		zBP = z;
 		z = 0;
 		//Keep track of the value of the activation function
-		o = r;
+		o += r;
 		
 		//Feed to the "to" neurons of each connection by adding the value of activation function times the 
 		//weight of the respective connection to the weightInputs of the "to" neuron. Don't do this for the output
