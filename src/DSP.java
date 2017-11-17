@@ -152,6 +152,7 @@ public class DSP {
 	         int framesRead;
 	         
 	         double tempBuff[] = new double[numChannels*windowSize];
+	         int counter = 0;
 	         
 	         do
 	         {
@@ -160,47 +161,56 @@ public class DSP {
 	        	
 	            framesRead = wavFile.readFrames(tempBuff, windowSize);
 	     
-	            double newBuffer[] = getFirstChannel(tempBuff, windowSize);
-	            tempBuffer.add(newBuffer);
-	         
-	            
+	            double newBuf[] = getFirstChannel(tempBuff, windowSize);
+	            tempBuffer.add(newBuf);
 	         }
 	         while (framesRead != 0);
-
+	         
 	         // Close the wavFile
 	         wavFile.close();
-	         
-				FFT fft = new FFT(fftSize, -1);
+	         		
+	         	
 				ArrayList<double[]> newBuffer = new ArrayList<double[]>();
 				sizeF+= tempBuffer.size();
 				
-				for(int i = 0; i < tempBuffer.size(); i++)
+				if(fftSize > 0)
 				{
-						fft.transform(tempBuffer.get(i));
-						double [] buf = new double[fftSize/2];
-						
-						for(int j = fftSize/2; j < fftSize; j++)
-						{
-							buf[j-fftSize/2] = (double) tempBuffer.get(i)[j];
-						}
-						double temp1[] = normalizeFunction(buf);
-
-						//double temp2[] = window(temp1, 8);
+					FFT fft = new FFT(fftSize, -1);
 					
+					for(int i = 0; i < tempBuffer.size(); i++)
+					{
+					
+							fft.transform(tempBuffer.get(i));
 							
-						newBuffer.add(temp1);
+							double [] buf = new double[fftSize/2];
+								
+							for(int j = fftSize/2; j < fftSize; j++)
+							{
+								buf[j-fftSize/2] = (double) tempBuffer.get(i)[j];
+							}
+								
+							newBuffer.add(buf);
+							//double temp2[] = window(temp1, 8);
+					}
+				}
+				else
+				{
+					for(int i = 0; i < tempBuffer.size(); i++)
+					{
+						newBuffer.add(tempBuffer.get(i));
+					}
 				}
 				
-	         
-	         buffer.add(newBuffer);
+				buffer.add(newBuffer);
 	      }
+		
 	      catch (Exception e)
 	      {
 	         System.err.println(e);
 	      }
 			
-			
-			outputs.add(outputsI);
+	
+		outputs.add(outputsI);
 	}
 	
 	public void createTrainerO(Scanner scanner) throws IOException

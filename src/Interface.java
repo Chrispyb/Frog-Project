@@ -21,7 +21,7 @@ public class Interface {
 	static boolean quit = false;
 	static Network network;
 
-	public static void main(String[] args) throws NumberFormatException, IOException
+	public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException
 	{
 		
 		
@@ -144,6 +144,7 @@ public class Interface {
 				}
 			 
 		}
+		Thread.sleep(1000);
 	}
 	
 	public static void parser(String input, BufferedReader reader) throws IOException, NumberFormatException, WavFileException
@@ -181,9 +182,11 @@ public class Interface {
 				String tLoc = reader.readLine().trim();
 				String vLoc = reader.readLine().trim();
 				String testLoc = reader.readLine().trim();
+				int numEpochs = Integer.parseInt(reader.readLine().trim());
 				float regConst = Float.parseFloat(reader.readLine().trim());
+				String normalization = reader.readLine().trim();
 				reader.readLine();
-				tvt(tLoc, vLoc, testLoc, regConst);
+				tvt(tLoc, vLoc, testLoc, regConst, numEpochs, normalization);
 				break;
 				
 			case "dsp(){":
@@ -430,7 +433,7 @@ public class Interface {
 			System.out.println("No Network exists. Create a network before training.");
 	}
 	
-	public static void tvt(String tLoc, String vLoc, String testLoc, float regConstant) throws IOException{
+	public static void tvt(String tLoc, String vLoc, String testLoc, float regConstant, int numEpochs, String normalization) throws IOException{
 		
 		if(network != null)
 		{
@@ -532,27 +535,63 @@ public class Interface {
 				outputsTR.add(out);
 			}
 			
+			if(normalization.equals("absolute"))
+			{
+				absoluteNormalize(inputsT);
+				absoluteNormalize(inputsV);
+				absoluteNormalize(inputsTR);
+			}
+			
 			Random random = new Random();
 			
 			boolean quit = false;
 			int quitCounter = 0;
 			float lastError = 1;
+			int epochCount = 0;
 			
-			while(!quit)
+			while(!quit && epochCount < numEpochs)
 			{
+				ArrayList<float []> batch = new ArrayList<float []>();
+				int [] p = new int [numTrainersT/10];
+				
+				for(int i = 0; i < numTrainersT/10; i++)
+				{
+					p[i] = random.nextInt(numTrainersT);
+					batch.add(inputsV.get(p[i]));
+				}
+				
+				if(normalization.equals("batch"))
+					batchNormalize(batch);
+				
 				for(int j = 0; j < numTrainersT/10; j++)
 				{
-					int p = random.nextInt(numTrainersT);
-					network.trainNetwork(inputsT.get(p), outputsT.get(p), 1, numTrainersT/10,regConstant);
+					if(normalization.equals("window"))
+						windowedNormalize(batch.get(j));
+					
+					network.trainNetwork(batch.get(j), outputsT.get(p[j]), 1, numTrainersT/10,regConstant);
 					
 				}
 
 				System.out.println("Training Epoch Finished.");
 				float error = 0;
+				
+				ArrayList<float []> batchV = new ArrayList<float []>();
+				
 				for(int i = 0; i < numTrainersV/10; i++)
 				{
-					int p = random.nextInt(numTrainersV);
-					float [] output = network.feedForward(inputsV.get(p));
+					int pV = random.nextInt(numTrainersV);
+					batchV.add(inputsV.get(pV));
+				}
+				
+				if(normalization.equals("batch"))
+					batchNormalize(batchV);
+					
+				for(int i = 0; i < numTrainersV/10; i++)
+				{
+					if(normalization.equals("window"))
+						windowedNormalize(batchV.get(i));
+					
+					float [] output = network.feedForward(batchV.get(i));
 					network.clearInternals();
 				
 					float max = 0;
@@ -569,9 +608,9 @@ public class Interface {
 							element = j;
 						}
 						
-						if(outputsV.get(p)[j] > maxD)
+						if(outputsV.get(i)[j] > maxD)
 						{
-							maxD = outputsV.get(p)[j];
+							maxD = outputsV.get(i)[j];
 							elementD = j;
 						}
 					}
@@ -581,7 +620,7 @@ public class Interface {
 				}
 				
 				float totalError = error/(numTrainersV/10);
-				System.out.println("Verification set error: " + totalError);
+				System.out.println("Validation set error: " + totalError);
 
 				if(totalError >= lastError){
 					quitCounter++;
@@ -590,9 +629,11 @@ public class Interface {
 				else
 					quitCounter = 0;
 				
-				if(quitCounter == 15)
+				if(quitCounter == 150)
 					quit = true;
 				lastError = totalError;
+				
+				epochCount++;
 			}
 		}
 	}
@@ -698,6 +739,67 @@ public class Interface {
 		else
 			System.out.println("No Network found. Please create a network before testing.");
 		
+	}
+	
+	public static void windowedNormalize(float [] input)
+	{
+		float max = 0;
+		
+		for(int i = 0; i < input.length; i++)
+		{
+			if(Math.abs(input[i]) > max)
+				max = Math.abs(input[i]);
+		}
+		
+		for(int i = 0; i < input.length; i++)
+		{
+			input[i] = input[i] / max;
+		}
+	}
+	
+	public static void batchNormalize(ArrayList<float []> batch)
+	{
+	
+		float max = 0;
+		
+		for(int i = 0; i < batch.size(); i++)
+		{
+			for(int j = 0; j < batch.get(i).length; j++)
+			{
+				if(Math.abs(batch.get(i)[j]) > max)
+					max = Math.abs(batch.get(i)[j]);
+			}
+		}
+		
+		for(int i = 0; i < batch.size(); i++)
+		{
+			for(int j = 0; j < batch.get(i).length; j++)
+			{
+				batch.get(i)[j] = batch.get(i)[j]/max;
+			}
+		}
+	}
+	
+	public static void absoluteNormalize(ArrayList<float []> data)
+	{
+		float max = 0;
+		
+		for(int i = 0; i < data.size(); i++)
+		{
+			for(int j = 0; j < data.get(i).length; j++)
+			{
+				if(Math.abs(data.get(i)[j]) > max)
+					max = Math.abs(data.get(i)[j]);
+			}
+		}
+		
+		for(int i = 0; i < data.size(); i++)
+		{
+			for(int j = 0; j < data.get(i).length; j++)
+			{
+				data.get(i)[j] = data.get(i)[j]/max;
+			}
+		}
 	}
 	
 	public static void dsp() throws IOException, NumberFormatException, WavFileException{
